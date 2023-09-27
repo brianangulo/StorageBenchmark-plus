@@ -1,6 +1,7 @@
 import {appSchema, Database, Model, tableSchema} from '@nozbe/watermelondb';
 import {field} from '@nozbe/watermelondb/decorators';
 import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
+import {test64kbJSON} from '../../64KB';
 
 const TABLE = 'Test';
 
@@ -37,7 +38,7 @@ const promise = database.write(async () => {
   try {
     const entry = await table.create(m => {
       m._raw.id = 'hello';
-      m.value = 'hello';
+      m.value = JSON.stringify(test64kbJSON);
     });
     return entry;
   } catch (e) {

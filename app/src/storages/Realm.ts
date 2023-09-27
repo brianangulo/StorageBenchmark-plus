@@ -1,4 +1,5 @@
 import Realm from 'realm';
+import {test64kbJSON} from '../../64KB';
 
 const TestSchema = {
   name: 'Test',
@@ -18,7 +19,7 @@ const realm = (async () => {
     r.deleteAll();
     r.create('Test', {
       _id: 1,
-      value: 'hello',
+      value: JSON.stringify(test64kbJSON),
     });
   });
   return r;

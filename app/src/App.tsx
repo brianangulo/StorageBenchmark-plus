@@ -6,27 +6,27 @@ import {
   StyleSheet,
   useColorScheme,
 } from 'react-native';
-import {getFromAsyncStorage} from './storages/AsyncStorage';
+import {getFromAsyncStorage, writeToAsyncStorage} from './storages/AsyncStorage';
 import {getFromMMKV} from './storages/MMKV';
 import {getFromReactNativeKeychain} from './storages/ReactNativeKeychain';
 import {getFromRealm} from './storages/Realm';
-import {getFromSQLite} from './storages/SQLite';
+import {getFromSQLite, writeToSqliteResult} from './storages/SQLite';
 import {getFromWatermelonDB} from './storages/WatermelonDB';
 import {getFromMMKVEncrypted} from './storages/MMKVEncrypted';
 import {getFromExpoSecureStorage} from "./storages/ExpoSecureStorage";
+import { readFromFS, writeToFS } from './storages/FileSystemStorage';
 
 declare global {
   const performance: {now: () => number};
 }
 
-const iterations = 1000;
+const iterations = 1;
 
 async function benchmark(
   label: string,
   fn: () => unknown | Promise<unknown>,
 ): Promise<number> {
   try {
-    console.log(`Starting Benchmark "${label}"...`);
     const start = performance.now();
     for (let i = 0; i < iterations; i++) {
       const r = fn();
@@ -58,13 +58,21 @@ const App = () => {
     await waitForGC();
     await benchmark('MMKV Encrypt         ', getFromMMKVEncrypted);
     await waitForGC();
-    await benchmark('AsyncStorage         ', getFromAsyncStorage);
+    await benchmark('AsyncStorage WRITE        ', writeToAsyncStorage);
+    await waitForGC();
+    await benchmark('AsyncStorage READ        ', getFromAsyncStorage);
+    await waitForGC();
+    await benchmark('FileSystem Write        ', writeToFS);
+    await waitForGC();
+    await benchmark('FileSystem READ        ', readFromFS);
     await waitForGC();
     await benchmark('Expo Secure Storage  ', getFromExpoSecureStorage);
     await waitForGC();
     await benchmark('React Native Keychain', getFromReactNativeKeychain);
     await waitForGC();
-    await benchmark('SQLite               ', getFromSQLite);
+    await benchmark('SQLite WRITE               ', writeToSqliteResult);
+    await waitForGC();
+    await benchmark('SQLite READ               ', getFromSQLite);
     await waitForGC();
     await benchmark('RealmDB              ', getFromRealm);
     await waitForGC();

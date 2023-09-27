@@ -1,4 +1,5 @@
 import {QuickSQLite} from 'react-native-quick-sqlite';
+import {test64kbJSON} from '../../64KB';
 
 const db = 'myDatabase';
 
@@ -19,9 +20,10 @@ QuickSQLite.executeSql(
   'CREATE TABLE IF NOT EXISTS Benchmark(value VARCHAR(30))',
   [],
 );
-QuickSQLite.executeSql(db, 'INSERT INTO Benchmark (value) VALUES (:value)', [
-  'hello',
-]);
+export const writeToSqliteResult = () =>
+  QuickSQLite.executeSql(db, 'INSERT INTO Benchmark (value) VALUES (:value)', [
+    JSON.stringify(test64kbJSON),
+  ]);
 
 export function getFromSQLite(): string | undefined {
   let {status, rows} = QuickSQLite.executeSql(
